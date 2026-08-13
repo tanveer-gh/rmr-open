@@ -7,6 +7,8 @@ import Countdown from "@/components/Countdown";
 import TeamShowcase from "@/components/TeamShowcase";
 import {
   currentTournament,
+  freeAgents,
+  hasFullFreeAgentTeam,
   matches,
   teams,
   type Match,
@@ -95,6 +97,37 @@ export default function TournamentHubPage() {
 
           <div className="mt-8 w-full border-t border-steel-dark/50 pt-6">
             <Countdown />
+          </div>
+
+          {/* Free agent pool */}
+          <div className="mt-8 w-full border-t border-steel-dark/50 pt-6 text-left">
+            <p className="text-center text-xs tracking-[0.3em] text-muted uppercase">
+              Free Agents
+            </p>
+            <ul className="mt-4 flex flex-col gap-2">
+              {freeAgents.map((agent) => (
+                <li
+                  key={agent.name}
+                  className="flex items-baseline justify-between gap-2"
+                >
+                  <span className="truncate text-sm text-steel">
+                    {agent.name}
+                  </span>
+                  <span className="shrink-0 text-[9px] tracking-[0.15em] text-muted uppercase">
+                    {agent.position}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {hasFullFreeAgentTeam(freeAgents) && (
+              <p className="mt-4 text-xs leading-5 text-green-400">
+                Enough for a full team — a random free agent squad forms at
+                check-in.
+              </p>
+            )}
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Leftover free agents fill incomplete rosters at puck drop.
+            </p>
           </div>
         </aside>
 

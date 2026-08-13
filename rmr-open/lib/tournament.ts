@@ -111,6 +111,30 @@ export const matches: Match[] = [
   },
 ];
 
+export type FreeAgent = {
+  name: string;
+  position: "Forward" | "Defense" | "Goalie" | "Flex";
+};
+
+// Free agent pool — when it holds 4 skaters + 1 goalie, a random team is
+// formed from it at check-in (team name drawn from a preset list).
+export const freeAgents: FreeAgent[] = [
+  { name: "LoneWolf7", position: "Forward" },
+  { name: "IcePickle", position: "Defense" },
+  { name: "SundinFan13", position: "Forward" },
+  { name: "BluePaintDrifter", position: "Defense" },
+  { name: "BrickWallBackup", position: "Goalie" },
+  { name: "WhereverNeeded", position: "Flex" },
+];
+
+export function hasFullFreeAgentTeam(pool: FreeAgent[]): boolean {
+  const goalies = pool.filter(
+    (p) => p.position === "Goalie" || p.position === "Flex",
+  ).length;
+  const skaters = pool.filter((p) => p.position !== "Goalie").length;
+  return goalies >= 1 && skaters >= 4 && pool.length >= 5;
+}
+
 export function getTeam(id: string | null): Team | undefined {
   return id ? teams.find((t) => t.id === id) : undefined;
 }
