@@ -4,7 +4,7 @@ import Countdown from "@/components/Countdown";
 
 const tabs = [
   { label: "Register", href: "/register" },
-  { label: "Bracket", href: "/tournaments" },
+  { label: "Bracket", href: "/bracket" },
   { label: "Leaderboard", href: "/rankings" },
 ] as const;
 
