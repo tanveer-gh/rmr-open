@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import type { Match, Team } from "@/lib/tournament";
 import { roundName } from "@/lib/tournament";
 
-// Single-elimination bracket. Column entries are either a match or a
-// first-round bye for a top seed. Pass `matchHref` to make match cards
-// link through to a per-game stats page.
+// Single-elimination bracket with elbow connectors between rounds and a
+// subtle neon glow. Column entries are either a match or a first-round
+// bye. Pass `matchHref` to make match cards link to per-game pages.
 export type BracketColumnEntry =
   | { kind: "match"; match: Match }
   | { kind: "bye"; team: Team };
@@ -12,6 +13,10 @@ export type BracketColumnEntry =
 export type BracketColumn = BracketColumnEntry[];
 
 type TeamLookup = (id: string | null) => Team | undefined;
+
+const ROW_H = 116;
+const LINE =
+  "absolute bg-steel/50 shadow-[0_0_6px_rgba(174,185,191,0.35)]";
 
 function TeamRow({
   team,
@@ -63,9 +68,14 @@ function MatchCard({
   const aWins = decided && match.scoreA! > match.scoreB!;
   const bWins = decided && match.scoreB! > match.scoreA!;
 
+  const glow =
+    match.status === "live"
+      ? "shadow-[0_0_18px_rgba(193,39,45,0.22)]"
+      : "shadow-[0_0_16px_rgba(174,185,191,0.08)]";
+
   const card = (
     <div
-      className={`steel-frame w-56 bg-card ${
+      className={`steel-frame w-56 bg-card ${glow} ${
         href ? "transition-colors hover:bg-charcoal" : ""
       }`}
     >
@@ -134,31 +144,68 @@ export default function Bracket({
   const totalRounds = columns.length;
   const getTeam: TeamLookup = (id) =>
     id ? teams.find((team) => team.id === id) : undefined;
+  const bodyHeight = columns[0].length * ROW_H;
 
   return (
     <div className="overflow-x-auto pb-4">
-      <div className="flex min-w-max items-stretch gap-8">
-        {columns.map((entries, i) => (
-          <div key={i} className="flex flex-col">
-            <h3 className="mb-4 text-center text-[10px] font-semibold tracking-[0.25em] text-muted uppercase">
-              {roundName(i + 1, totalRounds)}
-            </h3>
-            <div className="flex flex-1 flex-col justify-around gap-4">
-              {entries.map((entry) =>
-                entry.kind === "match" ? (
-                  <MatchCard
-                    key={entry.match.id}
-                    match={entry.match}
-                    getTeam={getTeam}
-                    href={matchHref?.(entry.match)}
-                  />
-                ) : (
-                  <ByeCard key={`bye-${entry.team.id}`} team={entry.team} />
-                ),
+      <div className="relative mx-auto min-w-max px-2">
+        {/* Faint red/blue haze behind the bracket — the quiet version of the flare */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_50%,rgba(193,39,45,0.07),transparent_60%),radial-gradient(ellipse_at_85%_50%,rgba(31,95,160,0.09),transparent_60%)]" />
+
+        <div className="relative flex items-stretch">
+          {columns.map((entries, i) => (
+            <Fragment key={i}>
+              {/* Round column */}
+              <div className="flex flex-col">
+                <h3 className="mb-4 h-5 text-center text-[10px] font-semibold tracking-[0.25em] text-muted uppercase">
+                  {roundName(i + 1, totalRounds)}
+                </h3>
+                <div className="flex flex-col" style={{ height: bodyHeight }}>
+                  {entries.map((entry) => (
+                    <div
+                      key={
+                        entry.kind === "match"
+                          ? entry.match.id
+                          : `bye-${entry.team.id}`
+                      }
+                      className="flex flex-1 items-center"
+                    >
+                      {entry.kind === "match" ? (
+                        <MatchCard
+                          match={entry.match}
+                          getTeam={getTeam}
+                          href={matchHref?.(entry.match)}
+                        />
+                      ) : (
+                        <ByeCard team={entry.team} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Elbow connectors into the next round */}
+              {i < columns.length - 1 && (
+                <div className="flex w-10 flex-col">
+                  <div className="mb-4 h-5" />
+                  <div
+                    className="flex flex-col"
+                    style={{ height: bodyHeight }}
+                  >
+                    {columns[i + 1].map((_, j) => (
+                      <div key={j} className="relative flex-1">
+                        <span className={`${LINE} top-1/4 left-0 h-px w-1/2`} />
+                        <span className={`${LINE} top-3/4 left-0 h-px w-1/2`} />
+                        <span className={`${LINE} top-1/4 left-1/2 h-1/2 w-px`} />
+                        <span className={`${LINE} top-1/2 left-1/2 h-px w-1/2`} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
-            </div>
-          </div>
-        ))}
+            </Fragment>
+          ))}
+        </div>
       </div>
     </div>
   );
