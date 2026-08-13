@@ -3,9 +3,9 @@ import Link from "next/link";
 import Countdown from "@/components/Countdown";
 
 const tabs = [
-  { label: "Register", href: "/register" },
-  { label: "Bracket", href: "/bracket" },
-  { label: "Leaderboard", href: "/leaderboard" },
+  { label: "Rules", href: "/rules", featured: false },
+  { label: "Register", href: "/register", featured: true },
+  { label: "Bracket", href: "/bracket", featured: false },
 ] as const;
 
 export default function Home() {
@@ -42,15 +42,26 @@ export default function Home() {
         </a>
       </h2>
 
-      {/* Main tabs */}
-      <div className="mt-8 grid w-full max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
-        {tabs.map(({ label, href }) => (
+      {/* Main tabs — Register is featured */}
+      <div className="mt-8 grid w-full max-w-4xl grid-cols-1 items-center gap-6 sm:grid-cols-3">
+        {tabs.map(({ label, href, featured }) => (
           <Link
             key={label}
             href={href}
-            className="steel-frame flex h-28 items-center justify-center bg-card transition-colors hover:bg-charcoal"
+            style={featured ? { borderColor: "var(--steel)" } : undefined}
+            className={`steel-frame flex items-center justify-center bg-card transition-colors hover:bg-charcoal ${
+              featured
+                ? "h-32 shadow-[0_0_24px_rgba(174,185,191,0.12)] sm:h-36"
+                : "h-28"
+            }`}
           >
-            <span className="font-display text-lg font-semibold tracking-[0.25em] text-steel uppercase">
+            <span
+              className={`font-display font-semibold tracking-[0.25em] uppercase ${
+                featured
+                  ? "text-2xl font-bold text-steel-bright"
+                  : "text-lg text-steel"
+              }`}
+            >
               {label}
             </span>
           </Link>
