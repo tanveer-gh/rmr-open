@@ -1,13 +1,17 @@
+import Link from "next/link";
 import type { Match, Team } from "@/lib/tournament";
-import { getTeam, roundName } from "@/lib/tournament";
+import { roundName } from "@/lib/tournament";
 
 // Single-elimination bracket. Column entries are either a match or a
-// first-round bye for a top seed.
+// first-round bye for a top seed. Pass `matchHref` to make match cards
+// link through to a per-game stats page.
 export type BracketColumnEntry =
   | { kind: "match"; match: Match }
   | { kind: "bye"; team: Team };
 
 export type BracketColumn = BracketColumnEntry[];
+
+type TeamLookup = (id: string | null) => Team | undefined;
 
 function TeamRow({
   team,
@@ -32,9 +36,7 @@ function TeamRow({
             {team.seed}
           </span>
         )}
-        <span
-          className={`truncate text-sm ${winner ? "font-semibold" : ""}`}
-        >
+        <span className={`truncate text-sm ${winner ? "font-semibold" : ""}`}>
           {team ? team.name : placeholder}
         </span>
       </span>
@@ -45,15 +47,28 @@ function TeamRow({
   );
 }
 
-function MatchCard({ match }: { match: Match }) {
+function MatchCard({
+  match,
+  getTeam,
+  href,
+}: {
+  match: Match;
+  getTeam: TeamLookup;
+  href?: string;
+}) {
   const teamA = getTeam(match.teamA);
   const teamB = getTeam(match.teamB);
-  const decided = match.status === "final" && match.scoreA !== null && match.scoreB !== null;
+  const decided =
+    match.status === "final" && match.scoreA !== null && match.scoreB !== null;
   const aWins = decided && match.scoreA! > match.scoreB!;
   const bWins = decided && match.scoreB! > match.scoreA!;
 
-  return (
-    <div className="steel-frame w-56 bg-card">
+  const card = (
+    <div
+      className={`steel-frame w-56 bg-card ${
+        href ? "transition-colors hover:bg-charcoal" : ""
+      }`}
+    >
       <div className="flex items-center justify-between border-b border-steel-dark/40 px-3 py-1">
         <span className="text-[9px] tracking-[0.2em] text-muted uppercase">
           {match.status === "live" ? (
@@ -64,6 +79,11 @@ function MatchCard({ match }: { match: Match }) {
             "Upcoming"
           )}
         </span>
+        {href && (
+          <span className="text-[9px] tracking-[0.15em] text-muted uppercase">
+            Stats →
+          </span>
+        )}
       </div>
       <TeamRow
         team={teamA}
@@ -80,6 +100,8 @@ function MatchCard({ match }: { match: Match }) {
       />
     </div>
   );
+
+  return href ? <Link href={href as never}>{card}</Link> : card;
 }
 
 function ByeCard({ team }: { team: Team }) {
@@ -100,8 +122,18 @@ function ByeCard({ team }: { team: Team }) {
   );
 }
 
-export default function Bracket({ columns }: { columns: BracketColumn[] }) {
+export default function Bracket({
+  columns,
+  teams,
+  matchHref,
+}: {
+  columns: BracketColumn[];
+  teams: Team[];
+  matchHref?: (match: Match) => string;
+}) {
   const totalRounds = columns.length;
+  const getTeam: TeamLookup = (id) =>
+    id ? teams.find((team) => team.id === id) : undefined;
 
   return (
     <div className="overflow-x-auto pb-4">
@@ -114,7 +146,12 @@ export default function Bracket({ columns }: { columns: BracketColumn[] }) {
             <div className="flex flex-1 flex-col justify-around gap-4">
               {entries.map((entry) =>
                 entry.kind === "match" ? (
-                  <MatchCard key={entry.match.id} match={entry.match} />
+                  <MatchCard
+                    key={entry.match.id}
+                    match={entry.match}
+                    getTeam={getTeam}
+                    href={matchHref?.(entry.match)}
+                  />
                 ) : (
                   <ByeCard key={`bye-${entry.team.id}`} team={entry.team} />
                 ),

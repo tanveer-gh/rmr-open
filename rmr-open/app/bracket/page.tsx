@@ -149,7 +149,7 @@ export default function BracketPage() {
 
       {phase === "live" && (
         <section className="mt-10">
-          <Bracket columns={liveColumns} />
+          <Bracket columns={liveColumns} teams={teams} />
         </section>
       )}
 
@@ -163,7 +163,7 @@ export default function BracketPage() {
               Ice Reapers
             </p>
           </div>
-          <Bracket columns={completeColumns} />
+          <Bracket columns={completeColumns} teams={teams} />
         </section>
       )}
     </main>
