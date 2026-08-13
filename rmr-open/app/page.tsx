@@ -5,7 +5,7 @@ import Countdown from "@/components/Countdown";
 const tabs = [
   { label: "Register", href: "/register" },
   { label: "Bracket", href: "/bracket" },
-  { label: "Leaderboard", href: "/rankings" },
+  { label: "Leaderboard", href: "/leaderboard" },
 ] as const;
 
 export default function Home() {

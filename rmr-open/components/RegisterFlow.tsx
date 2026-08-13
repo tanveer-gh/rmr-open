@@ -386,12 +386,24 @@ export default function RegisterFlow() {
         </div>
       )}
 
-      <button
-        type="submit"
-        className="steel-frame bg-charcoal/60 px-6 py-3 text-sm font-semibold tracking-[0.25em] text-steel uppercase transition-colors hover:bg-charcoal hover:text-steel-bright"
-      >
-        {mode === "team" ? "Register Team" : "Confirm Registration"}
-      </button>
+      <div className="flex flex-col gap-3">
+        <button
+          type="submit"
+          className="steel-frame bg-charcoal/60 px-6 py-3 text-sm font-semibold tracking-[0.25em] text-steel uppercase transition-colors hover:bg-charcoal hover:text-steel-bright"
+        >
+          {mode === "team" ? "Register Team" : "Confirm Registration"}
+        </button>
+        <p className="text-center text-xs text-muted">
+          By registering you agree to the{" "}
+          <a
+            href="/rules"
+            className="text-steel underline underline-offset-4 transition-colors hover:text-steel-bright"
+          >
+            tournament rules
+          </a>
+          .
+        </p>
+      </div>
     </form>
   );
 }
