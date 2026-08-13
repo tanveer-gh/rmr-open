@@ -95,27 +95,27 @@ export default function TeamPage() {
           {teamName}
         </h1>
       )}
-      <div className="mt-3 flex items-center gap-5">
+      <div className="mt-3">
         <button
           onClick={() => setRenaming(true)}
           className="text-[10px] tracking-[0.2em] text-muted uppercase transition-colors hover:text-steel"
         >
           Rename
         </button>
-        <span
-          className={`text-[10px] tracking-[0.2em] uppercase ${checkedIn ? "text-teal" : "text-muted"}`}
-        >
-          {checkedIn ? "✓ Checked in" : "Not checked in"}
-        </span>
-        {!checkedIn && (
-          <button
-            onClick={() => setCheckedIn(true)}
-            className="text-[10px] tracking-[0.2em] text-steel-bright uppercase underline underline-offset-4 transition-colors hover:text-teal"
-          >
-            Check in
-          </button>
-        )}
       </div>
+
+      {/* Check-in — red until checked in, green after */}
+      <button
+        onClick={() => setCheckedIn(true)}
+        disabled={checkedIn}
+        className={`mt-8 border-2 px-10 py-4 text-lg font-bold tracking-[0.25em] uppercase transition-colors ${
+          checkedIn
+            ? "cursor-default border-green-500 bg-green-500/10 text-green-400"
+            : "border-blade-red bg-blade-red/10 text-blade-red hover:bg-blade-red/20"
+        }`}
+      >
+        {checkedIn ? "✓ Checked In" : "Check In"}
+      </button>
 
       {/* Roster */}
       <div className="mt-12 flex flex-col gap-8">

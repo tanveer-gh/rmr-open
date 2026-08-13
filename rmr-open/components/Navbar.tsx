@@ -51,6 +51,13 @@ export default function Navbar() {
           >
             Home
           </Link>
+          <Link
+            href="/team"
+            className={linkClasses(pathname.startsWith("/team"))}
+            onClick={() => setOpen(false)}
+          >
+            My Team
+          </Link>
         </div>
 
         {/* Desktop links */}
@@ -101,7 +108,7 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {open && (
         <ul className="flex flex-col border-t border-steel-dark/50 md:hidden">
-          {links.map(({ href, label }) => (
+          {[{ href: "/team", label: "My Team" } as const, ...links].map(({ href, label }) => (
             <li key={href}>
               <Link
                 href={href}
