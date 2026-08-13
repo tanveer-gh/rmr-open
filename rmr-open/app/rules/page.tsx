@@ -26,7 +26,7 @@ const sections = [
   {
     title: "Check-in",
     rules: [
-      "Check-in opens 30 minutes before puck drop and closes at 8:00 PM EST.",
+      "Check-in opens 45 minutes before puck drop — 7:15 PM EST (4:15 PM PST) — and closes at 8:00 PM EST.",
       "Teams that fail to check in lose their spot; free agents may be used to fill incomplete rosters.",
       "Free agents who signed up are committing to being available at 8:00 PM EST if called on.",
     ],

@@ -139,7 +139,8 @@ export default function BracketPage() {
             </ul>
           </div>
           <p className="mt-4 text-center text-xs leading-5 text-muted">
-            Check-in opens 30 minutes before puck drop. Teams that don&apos;t
+            Check-in opens 45 minutes before puck drop — 7:15 PM EST (4:15 PM
+            PST). Teams that don&apos;t
             check in lose their spot to free agents. Seeding and the bracket
             are revealed at 8:00 PM EST.
           </p>
