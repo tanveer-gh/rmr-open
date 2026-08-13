@@ -3,7 +3,7 @@ const sections = [
     title: "Format",
     rules: [
       "The RMR Open is a weekly single-elimination tournament played in Puck, every Saturday at 8:00 PM EST.",
-      "The bracket is seeded at puck drop. When the number of teams isn't a power of two, top seeds receive first-round byes.",
+      "The bracket is randomly generated once all teams are checked in, just before 8:00 PM EST. Matchups — and byes, when the team count isn't a power of two — are pure luck of the draw.",
       "All rounds are played the same night — one match per round per team.",
     ],
   },

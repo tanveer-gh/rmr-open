@@ -140,16 +140,24 @@ export default function BracketPage() {
           </div>
           <p className="mt-4 text-center text-xs leading-5 text-muted">
             Check-in opens 45 minutes before puck drop — 7:15 PM EST (4:15 PM
-            PST). Teams that don&apos;t
-            check in lose their spot to free agents. Seeding and the bracket
-            are revealed at 8:00 PM EST.
+            PST). Teams that don&apos;t check in lose their spot to free
+            agents. Once every team is checked in, the bracket is randomly
+            generated just before 8:00 PM EST — matchups and byes are pure
+            luck of the draw.
           </p>
         </section>
       )}
 
       {phase === "live" && (
         <section className="mt-10">
-          <Bracket columns={liveColumns} teams={teams} />
+          <Bracket
+            columns={liveColumns}
+            teams={teams}
+            matchHref={(match) => `/bracket/${match.id}`}
+          />
+          <p className="mt-2 text-center text-xs text-muted">
+            Click your match to open its match room and chat.
+          </p>
         </section>
       )}
 
@@ -163,7 +171,11 @@ export default function BracketPage() {
               Ice Reapers
             </p>
           </div>
-          <Bracket columns={completeColumns} teams={teams} />
+          <Bracket
+            columns={completeColumns}
+            teams={teams}
+            matchHref={(match) => `/bracket/${match.id}`}
+          />
         </section>
       )}
     </main>

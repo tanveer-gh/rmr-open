@@ -117,6 +117,27 @@ export default function TeamPage() {
         {checkedIn ? "✓ Checked In" : "Check In"}
       </button>
 
+      {/* Current match — front and center while the tournament runs */}
+      <Link
+        href="/bracket/sf-1"
+        className="steel-frame mt-6 flex items-center justify-between gap-4 bg-card p-5 transition-colors hover:bg-charcoal"
+      >
+        <span>
+          <span className="block text-[10px] tracking-[0.3em] text-blade-red uppercase">
+            ● Live — Your match
+          </span>
+          <span className="font-display mt-1 block text-lg font-bold tracking-[0.1em] text-steel-bright uppercase">
+            Semifinal vs Top Shelf
+          </span>
+        </span>
+        <span className="shrink-0 text-xs font-semibold tracking-[0.2em] text-steel uppercase">
+          Match room →
+        </span>
+      </Link>
+      <p className="mt-2 text-[10px] tracking-[0.15em] text-muted uppercase">
+        Demo — appears only while the tournament is running
+      </p>
+
       {/* Roster */}
       <div className="mt-12 flex flex-col gap-8">
         {roster.map((player, index) => (

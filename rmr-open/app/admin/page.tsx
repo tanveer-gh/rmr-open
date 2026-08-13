@@ -97,13 +97,30 @@ export default function AdminPage() {
         </p>
       </section>
 
-      {/* Registrations & seeding */}
+      {/* Registrations & bracket generation */}
       <section className="steel-frame mt-6 bg-card p-6">
-        <div className="flex items-baseline justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-sm font-semibold tracking-[0.25em] text-steel uppercase">
-            Registrations &amp; Seeding
+            Registrations
           </h2>
-          <span className="text-xs text-muted">{teams.length} teams</span>
+          <span className="flex items-center gap-3">
+            <span className="text-xs text-muted">{teams.length} teams</span>
+            <button
+              onClick={() =>
+                setTeams((prev) => {
+                  const shuffled = [...prev];
+                  for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                  }
+                  return shuffled.map((t, i) => ({ ...t, seed: i + 1 }));
+                })
+              }
+              className="steel-frame bg-charcoal/60 px-4 py-2 text-[10px] font-semibold tracking-[0.2em] text-steel uppercase transition-colors hover:bg-charcoal hover:text-steel-bright"
+            >
+              🎲 Generate Random Bracket
+            </button>
+          </span>
         </div>
         <ul className="mt-4 flex flex-col">
           {teams.map((team, index) => (
@@ -153,9 +170,11 @@ export default function AdminPage() {
           ))}
         </ul>
         <p className="mt-3 text-xs leading-5 text-muted">
-          Order = seeding. Top seeds receive byes when the team count
-          isn&apos;t a power of two. Free agent pool and roster details appear
-          here with the database.
+          The bracket is randomly generated once all teams are checked in
+          (~7:55 PM EST) — the dice button previews the shuffle; at launch it
+          runs automatically and creates a match room with chat for each
+          pairing. Byes fall wherever the draw lands them. Arrows allow a
+          manual override if something needs fixing.
         </p>
       </section>
 
