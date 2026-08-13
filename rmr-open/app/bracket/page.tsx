@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Bracket, { type BracketColumn } from "@/components/Bracket";
+import TeamShowcase from "@/components/TeamShowcase";
 import {
   currentTournament,
   matches,
@@ -100,50 +101,15 @@ export default function BracketPage() {
       </div>
 
       {phase === "registration" && (
-        <section className="mx-auto mt-10 w-full max-w-2xl">
-          <div className="steel-frame bg-card p-6">
-            <div className="flex items-baseline justify-between">
-              <h2 className="font-display text-sm font-semibold tracking-[0.25em] text-steel uppercase">
-                Registered Teams
-              </h2>
-              <span className="text-xs text-muted">{teams.length} teams</span>
-            </div>
-            <ul className="mt-4 flex flex-col">
-              {teams.map((team) => (
-                <li
-                  key={team.id}
-                  className="flex items-center justify-between border-b border-steel-dark/30 py-3 last:border-b-0"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="w-5 text-right text-xs text-muted">
-                      {team.seed}
-                    </span>
-                    <span className="text-sm text-steel-bright">
-                      {team.name}
-                    </span>
-                  </span>
-                  <span
-                    className={`flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase ${
-                      team.checkedIn ? "text-teal" : "text-muted"
-                    }`}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        team.checkedIn ? "bg-teal" : "bg-steel-dark"
-                      }`}
-                    />
-                    {team.checkedIn ? "Checked in" : "Not checked in"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <p className="mt-4 text-center text-xs leading-5 text-muted">
+        <section className="mt-10">
+          <TeamShowcase teams={teams} />
+          <p className="mx-auto mt-8 max-w-2xl text-center text-xs leading-5 text-muted">
             Check-in opens 45 minutes before puck drop — 7:15 PM EST (4:15 PM
             PST). Teams that don&apos;t check in lose their spot to free
             agents. Once every team is checked in, the bracket is randomly
             generated just before 8:00 PM EST — matchups and byes are pure
-            luck of the draw.
+            luck of the draw. The live bracket appears right here at puck
+            drop.
           </p>
         </section>
       )}

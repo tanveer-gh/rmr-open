@@ -2,11 +2,18 @@
 // database later. The bracket is single elimination; when the team count
 // isn't a power of two, top seeds receive first-round byes.
 
+export type TeamPlayer = {
+  name: string;
+  position: "Skater" | "Goalie" | "Flex";
+  captain?: boolean;
+};
+
 export type Team = {
   id: string;
   name: string;
   seed: number;
   checkedIn: boolean;
+  players?: TeamPlayer[];
 };
 
 export type Match = {
@@ -30,13 +37,24 @@ export const currentTournament = {
 };
 
 // 6 teams registered → bracket of 8, seeds 1 and 2 get byes.
+// Rosters are placeholders until registration writes to the database.
+const roster = (
+  prefix: string,
+  count: number,
+): TeamPlayer[] =>
+  Array.from({ length: count }, (_, i) => ({
+    name: `${prefix}${i + 1}`,
+    position: i === count - 1 ? "Goalie" : i === count - 2 && count > 5 ? "Flex" : "Skater",
+    captain: i === 0,
+  }));
+
 export const teams: Team[] = [
-  { id: "ice-reapers", name: "Ice Reapers", seed: 1, checkedIn: true },
-  { id: "five-hole-bandits", name: "Five Hole Bandits", seed: 2, checkedIn: true },
-  { id: "blue-liners", name: "Blue Liners", seed: 3, checkedIn: true },
-  { id: "top-shelf", name: "Top Shelf", seed: 4, checkedIn: false },
-  { id: "zamboni-crew", name: "Zamboni Crew", seed: 5, checkedIn: true },
-  { id: "puck-wraiths", name: "Puck Wraiths", seed: 6, checkedIn: false },
+  { id: "ice-reapers", name: "Ice Reapers", seed: 1, checkedIn: true, players: roster("Reaper", 6) },
+  { id: "five-hole-bandits", name: "Five Hole Bandits", seed: 2, checkedIn: true, players: roster("Bandit", 5) },
+  { id: "blue-liners", name: "Blue Liners", seed: 3, checkedIn: true, players: roster("Liner", 7) },
+  { id: "top-shelf", name: "Top Shelf", seed: 4, checkedIn: false, players: roster("Shelf", 5) },
+  { id: "zamboni-crew", name: "Zamboni Crew", seed: 5, checkedIn: true, players: roster("Zamboni", 6) },
+  { id: "puck-wraiths", name: "Puck Wraiths", seed: 6, checkedIn: false, players: roster("Wraith", 5) },
 ];
 
 // Demo bracket used to preview the live/final states.
