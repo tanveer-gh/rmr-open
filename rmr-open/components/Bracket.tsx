@@ -15,8 +15,7 @@ export type BracketColumn = BracketColumnEntry[];
 type TeamLookup = (id: string | null) => Team | undefined;
 
 const ROW_H = 116;
-const LINE =
-  "absolute bg-steel/50 shadow-[0_0_6px_rgba(174,185,191,0.35)]";
+const LINE = "absolute bg-steel-dark";
 
 function TeamRow({
   team,
@@ -68,14 +67,9 @@ function MatchCard({
   const aWins = decided && match.scoreA! > match.scoreB!;
   const bWins = decided && match.scoreB! > match.scoreA!;
 
-  const glow =
-    match.status === "live"
-      ? "shadow-[0_0_18px_rgba(193,39,45,0.22)]"
-      : "shadow-[0_0_16px_rgba(174,185,191,0.08)]";
-
   const card = (
     <div
-      className={`steel-frame w-56 bg-card ${glow} ${
+      className={`steel-frame w-56 bg-card ${
         href ? "transition-colors hover:bg-charcoal" : ""
       }`}
     >
@@ -149,9 +143,6 @@ export default function Bracket({
   return (
     <div className="overflow-x-auto pb-4">
       <div className="relative mx-auto min-w-max px-2">
-        {/* Faint red/blue haze behind the bracket — the quiet version of the flare */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_15%_50%,rgba(193,39,45,0.07),transparent_60%),radial-gradient(ellipse_at_85%_50%,rgba(31,95,160,0.09),transparent_60%)]" />
-
         <div className="relative flex items-stretch">
           {columns.map((entries, i) => (
             <Fragment key={i}>
