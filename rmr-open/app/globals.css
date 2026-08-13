@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  /* Charcoal + steel palette matched to the reaper/scythe artwork */
+  --abyss: #0b0d10;
+  --charcoal: #171b20;
+  --charcoal-light: #21262d;
+  --steel: #aeb9bf;
+  --steel-bright: #e6ecef;
+  --steel-dark: #454c54;
+  --muted: #7d868d;
+  --card: #101318;
+  --blade-red: #c1272d;
+  --blade-blue: #1f5fa0;
+}
+
+@theme inline {
+  --color-abyss: var(--abyss);
+  --color-charcoal: var(--charcoal);
+  --color-charcoal-light: var(--charcoal-light);
+  --color-steel: var(--steel);
+  --color-steel-bright: var(--steel-bright);
+  --color-steel-dark: var(--steel-dark);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-blade-red: var(--blade-red);
+  --color-blade-blue: var(--blade-blue);
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-cinzel);
+}
+
+body {
+  background: var(--abyss);
+  color: var(--steel-bright);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Atmospheric backdrop for hero sections — replaced by real art later */
+.hero-atmosphere {
+  background:
+    radial-gradient(ellipse 45% 45% at 12% 30%, rgba(193, 39, 45, 0.1), transparent 70%),
+    radial-gradient(ellipse 45% 45% at 88% 30%, rgba(31, 95, 160, 0.12), transparent 70%),
+    radial-gradient(ellipse 70% 45% at 50% 115%, rgba(200, 208, 212, 0.05), transparent 70%),
+    linear-gradient(to bottom, #12151a, var(--abyss) 60%, #08090c);
+}
+
+/* Thin steel frame with brighter corner ticks */
+.steel-frame {
+  position: relative;
+  border: 1px solid var(--steel-dark);
+}
+.steel-frame::before,
+.steel-frame::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--steel);
+  border-style: solid;
+}
+.steel-frame::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.steel-frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 2px 2px 0;
+}
