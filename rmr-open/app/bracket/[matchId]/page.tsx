@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { currentTournament, getTeam, matches, roundName } from "@/lib/tournament";
 
@@ -32,6 +32,24 @@ export default function MatchRoomPage({
   const match = matches.find((m) => m.id === matchId);
   const [messages, setMessages] = useState(initialMessages);
   const [draft, setDraft] = useState("");
+
+  // Score reporting: both captains can submit; matching scores confirm
+  // instantly, and 2 minutes after a lone submission it auto-accepts.
+  const [reportA, setReportA] = useState("");
+  const [reportB, setReportB] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(120);
+  const [accepted, setAccepted] = useState(false);
+
+  useEffect(() => {
+    if (!submitted || accepted) return;
+    if (secondsLeft <= 0) {
+      setAccepted(true);
+      return;
+    }
+    const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [submitted, accepted, secondsLeft]);
 
   if (!match) notFound();
 
@@ -137,6 +155,87 @@ export default function MatchRoomPage({
         rosters — which every registered player already is. Messages are
         placeholders until the database is connected.
       </p>
+
+      {/* Score reporting — captains only */}
+      <section className="steel-frame mt-8 bg-card p-5">
+        <h2 className="font-display text-sm font-semibold tracking-[0.25em] text-steel uppercase">
+          Report Final Score
+        </h2>
+
+        {accepted ? (
+          <div className="mt-4">
+            <p className="text-sm font-semibold text-green-400">
+              ✓ Score accepted — {teamA?.name} {reportA} – {reportB}{" "}
+              {teamB?.name}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Reported by {mockUser}. The opposing captain didn&apos;t confirm
+              within 2 minutes, so the lone report was accepted. The bracket
+              advances automatically at launch.
+            </p>
+          </div>
+        ) : submitted ? (
+          <div className="mt-4">
+            <p className="text-sm text-steel-bright">
+              Score submitted: {teamA?.name} {reportA} – {reportB}{" "}
+              {teamB?.name}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Waiting for the opposing captain to confirm. If they don&apos;t
+              respond, your report is accepted automatically in{" "}
+              <span className="font-semibold text-steel-bright tabular-nums">
+                {Math.floor(secondsLeft / 60)}:
+                {String(secondsLeft % 60).padStart(2, "0")}
+              </span>
+              .
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="flex items-center gap-2 text-sm text-steel">
+                <span className="max-w-32 truncate">{teamA?.name}</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={reportA}
+                  onChange={(e) => setReportA(e.target.value)}
+                  aria-label={`${teamA?.name} final score`}
+                  className="w-16 border border-steel-dark bg-abyss px-2 py-2 text-center text-sm text-steel-bright focus:border-steel focus:outline-none"
+                />
+              </label>
+              <span className="text-muted">–</span>
+              <label className="flex items-center gap-2 text-sm text-steel">
+                <input
+                  type="number"
+                  min={0}
+                  value={reportB}
+                  onChange={(e) => setReportB(e.target.value)}
+                  aria-label={`${teamB?.name} final score`}
+                  className="w-16 border border-steel-dark bg-abyss px-2 py-2 text-center text-sm text-steel-bright focus:border-steel focus:outline-none"
+                />
+                <span className="max-w-32 truncate">{teamB?.name}</span>
+              </label>
+              <button
+                onClick={() => {
+                  if (reportA === "" || reportB === "") return;
+                  setSubmitted(true);
+                }}
+                className="steel-frame bg-charcoal/60 px-5 py-2 text-xs font-semibold tracking-[0.2em] text-steel uppercase transition-colors hover:bg-charcoal hover:text-steel-bright"
+              >
+                Submit Score
+              </button>
+            </div>
+            <p className="mt-3 text-xs leading-5 text-muted">
+              Captains only. If both captains submit matching scores, the
+              result confirms instantly; if the scores disagree, the organizer
+              is flagged to resolve it. If only one captain reports, it&apos;s
+              accepted automatically after 2 minutes. (Box-score automation
+              replaces this later.)
+            </p>
+          </div>
+        )}
+      </section>
     </main>
   );
 }

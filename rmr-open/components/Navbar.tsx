@@ -57,6 +57,18 @@ export default function Navbar() {
           >
             My Team
           </Link>
+          {/* Shown only while a tournament is running — links to your current match */}
+          <Link
+            href="/bracket/sf-1"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 text-sm font-bold tracking-[0.25em] text-blade-red uppercase transition-colors hover:text-red-400"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blade-red opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blade-red" />
+            </span>
+            Live
+          </Link>
         </div>
 
         {/* Desktop links */}
