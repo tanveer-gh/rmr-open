@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import ManageTeam from "@/components/ManageTeam";
 
-type Step = "signed-out" | "form" | "done";
+type Step = "signed-out" | "form" | "done" | "manage";
 type Mode = "team" | "free-agent";
 type Teammate = { steam: string; discord: string; position: string };
 
@@ -82,8 +83,18 @@ export default function RegisterFlow() {
         <p className="text-[10px] tracking-[0.15em] text-muted uppercase">
           Preview — real Steam sign-in comes with launch
         </p>
+        <button
+          onClick={() => setStep("manage")}
+          className="text-xs text-muted underline underline-offset-4 transition-colors hover:text-steel"
+        >
+          Already registered? Manage your team
+        </button>
       </div>
     );
+  }
+
+  if (step === "manage") {
+    return <ManageTeam onBack={() => setStep("signed-out")} />;
   }
 
   if (step === "done") {
