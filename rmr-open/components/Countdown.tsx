@@ -34,9 +34,14 @@ export default function Countdown() {
   > | null>(null);
 
   useEffect(() => {
-    setTimeLeft(getTimeLeft());
+    // First paint happens from the next frame so the effect body itself
+    // never sets state synchronously (placeholder shows for one frame).
+    const raf = requestAnimationFrame(() => setTimeLeft(getTimeLeft()));
     const id = setInterval(() => setTimeLeft(getTimeLeft()), 1000);
-    return () => clearInterval(id);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(id);
+    };
   }, []);
 
   const segments = [

@@ -135,6 +135,56 @@ export function hasFullFreeAgentTeam(pool: FreeAgent[]): boolean {
   return goalies >= 1 && skaters >= 4 && pool.length >= 5;
 }
 
+// Preset names for randomly-formed free agent squads. Each week's squad
+// takes the first name not already used by a registered team.
+export const FREE_AGENT_TEAM_NAMES = [
+  "The Reapers' Draft",
+  "Grim Pickings",
+  "Scythe Squad",
+  "The Bone Rattlers",
+  "Last Rites",
+  "The Undrafted",
+  "Graveyard Shift",
+  "Pale Riders",
+] as const;
+
+export function nextFreeAgentTeamName(takenNames: string[]): string {
+  const taken = new Set(takenNames.map((n) => n.toLowerCase()));
+  return (
+    FREE_AGENT_TEAM_NAMES.find((n) => !taken.has(n.toLowerCase())) ??
+    FREE_AGENT_TEAM_NAMES[0]
+  );
+}
+
+// True only while a tournament night is actually running — drives the LIVE
+// nav link and the "your match" cards instead of hardcoded demo state.
+export function isTournamentLive(): boolean {
+  return currentTournament.phase === "live";
+}
+
+// The live match a team is currently playing in, if any.
+export function findLiveMatch(teamId: string): Match | undefined {
+  return matches.find(
+    (m) => m.status === "live" && (m.teamA === teamId || m.teamB === teamId),
+  );
+}
+
+// A disagreement between the two captains' score reports, waiting on an
+// organizer ruling. Placeholder data until reporting is wired up.
+export type ScoreDispute = {
+  matchId: string;
+  reportA: { by: string; scoreA: number; scoreB: number };
+  reportB: { by: string; scoreA: number; scoreB: number };
+};
+
+export const scoreDisputes: ScoreDispute[] = [
+  {
+    matchId: "sf-1",
+    reportA: { by: "YourSteamName (Ice Reapers)", scoreA: 5, scoreB: 2 },
+    reportB: { by: "TopShelfCaptain (Top Shelf)", scoreA: 4, scoreB: 2 },
+  },
+];
+
 export function getTeam(id: string | null): Team | undefined {
   return id ? teams.find((t) => t.id === id) : undefined;
 }

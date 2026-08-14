@@ -4,6 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { DISCORD_INVITE, PHLSTATS_HOME } from "@/lib/site";
+import { findLiveMatch, isTournamentLive } from "@/lib/tournament";
+
+// Placeholder identity until Steam auth lands — used to find "your match".
+const viewerTeamId = "ice-reapers";
 
 const links = [
   { href: "/bracket", label: "Bracket" },
@@ -57,18 +62,25 @@ export default function Navbar() {
           >
             My Team
           </Link>
-          {/* Shown only while a tournament is running — links to your current match */}
-          <Link
-            href="/bracket/sf-1"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 text-sm font-bold tracking-[0.25em] text-blade-red uppercase transition-colors hover:text-red-400"
-          >
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blade-red opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blade-red" />
-            </span>
-            Live
-          </Link>
+          {/* Appears only while a tournament is running — links to your
+              current match, falling back to the bracket between games. */}
+          {isTournamentLive() && (
+            <Link
+              href={
+                findLiveMatch(viewerTeamId)
+                  ? `/bracket/${findLiveMatch(viewerTeamId)!.id}`
+                  : "/bracket"
+              }
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 text-sm font-bold tracking-[0.25em] text-blade-red uppercase transition-colors hover:text-red-400"
+            >
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blade-red opacity-75" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blade-red" />
+              </span>
+              Live
+            </Link>
+          )}
         </div>
 
         {/* Desktop links */}
@@ -85,12 +97,22 @@ export default function Navbar() {
           ))}
           <li>
             <a
-              href="https://phlstats.com/"
+              href={PHLSTATS_HOME}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs font-semibold tracking-[0.2em] uppercase text-muted transition-colors hover:text-steel"
             >
               PHLstats
+            </a>
+          </li>
+          <li>
+            <a
+              href={DISCORD_INVITE}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold tracking-[0.2em] uppercase text-muted transition-colors hover:text-steel"
+            >
+              Discord
             </a>
           </li>
         </ul>
@@ -136,13 +158,24 @@ export default function Navbar() {
           ))}
           <li>
             <a
-              href="https://phlstats.com/"
+              href={PHLSTATS_HOME}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setOpen(false)}
               className="block px-6 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-muted transition-colors hover:text-steel"
             >
               PHLstats
+            </a>
+          </li>
+          <li>
+            <a
+              href={DISCORD_INVITE}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="block px-6 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-muted transition-colors hover:text-steel"
+            >
+              Discord
             </a>
           </li>
         </ul>

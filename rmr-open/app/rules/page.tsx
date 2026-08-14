@@ -18,9 +18,14 @@ const sections = [
   {
     title: "Match Rules",
     rules: [
-      "Placeholder — match length, server settings, and overtime format go here.",
-      "Placeholder — forfeit and no-show rules go here.",
-      "Placeholder — dispute and replay policy go here.",
+      "Matches are a single game: three 5-minute periods on the in-game clock, 4 skaters and a goalie per side.",
+      "Tied after regulation? Sudden-death overtime in 5-minute periods until someone scores.",
+      "The team listed first in the bracket hosts the server and posts its name and password in the match chat before the round starts.",
+      "Substitutions are allowed between periods and during stoppages — rostered players only.",
+      "A team may start one skater short (4 total including goalie), but never with fewer. Free agents assigned at puck drop count as rostered.",
+      "A team that isn't in the server 10 minutes after its round opens forfeits the match.",
+      "If a player disconnects, play continues — they may rejoin at any time. A full-server crash restarts the period at 0–0 for that period, carrying the game score.",
+      "Both captains report the final score in the match room. Matching reports confirm instantly; disagreements go to the organizers, whose ruling is final. Keep a screenshot of the final scoreboard until results are confirmed.",
     ],
   },
   {
@@ -34,8 +39,11 @@ const sections = [
   {
     title: "Conduct",
     rules: [
-      "Placeholder — sportsmanship, chat conduct, and penalty policy go here.",
-      "Organizer decisions are final on the night of the tournament.",
+      "No slurs, harassment, or hate speech — in match chat, in-game, or the Discord. Zero tolerance.",
+      "No throwing matches, colluding on results, or playing on someone else's Steam account. One account, one player.",
+      "Trash talk is hockey; personal attacks aren't. Keep it about the game.",
+      "Violations earn a warning, removal from the night, or a ban from future Opens depending on severity — at the organizers' discretion.",
+      "Organizer decisions are final on the night of the tournament. Appeals can be raised afterward in the Discord.",
     ],
   },
 ];

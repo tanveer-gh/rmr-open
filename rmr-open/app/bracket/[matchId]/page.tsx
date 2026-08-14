@@ -4,6 +4,7 @@ import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { currentTournament, getTeam, matches, roundName } from "@/lib/tournament";
+import { DISCORD_INVITE } from "@/lib/site";
 
 // Demo identity + chat log — real messages persist per match with the database.
 const mockUser = "YourSteamName";
@@ -39,17 +40,14 @@ export default function MatchRoomPage({
   const [reportB, setReportB] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(120);
-  const [accepted, setAccepted] = useState(false);
+  // Lone report auto-accepts when the clock runs out — derived, not stored.
+  const accepted = submitted && secondsLeft <= 0;
 
   useEffect(() => {
-    if (!submitted || accepted) return;
-    if (secondsLeft <= 0) {
-      setAccepted(true);
-      return;
-    }
+    if (!submitted || secondsLeft <= 0) return;
     const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearTimeout(timer);
-  }, [submitted, accepted, secondsLeft]);
+  }, [submitted, secondsLeft]);
 
   if (!match) notFound();
 
@@ -153,7 +151,17 @@ export default function MatchRoomPage({
       <p className="mt-4 text-center text-xs leading-5 text-muted">
         Chat requires being signed in through Steam and on one of these two
         rosters — which every registered player already is. Messages are
-        placeholders until the database is connected.
+        placeholders until the database is connected. Server trouble or a
+        no-show? Ping the organizers in the{" "}
+        <a
+          href={DISCORD_INVITE}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-steel underline underline-offset-4 transition-colors hover:text-steel-bright"
+        >
+          Discord
+        </a>
+        .
       </p>
 
       {/* Score reporting — captains only */}

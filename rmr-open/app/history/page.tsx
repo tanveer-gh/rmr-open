@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { pastEvents } from "@/lib/history";
 import { playerStandings } from "@/lib/leaderboard";
+import { phlstatsPlayerUrl } from "@/lib/site";
 
 function SectionHeader({ label }: { label: string }) {
   return (
@@ -73,7 +74,7 @@ export default function HistoryPage() {
                   <span className="text-xs text-muted">{row.rank}</span>
                   <span className="min-w-0">
                     <a
-                      href="https://phlstats.com/"
+                      href={phlstatsPlayerUrl(row.player)}
                       target="_blank"
                       rel="noopener noreferrer"
                       title={`${row.player} on PHLstats`}

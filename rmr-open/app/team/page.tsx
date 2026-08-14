@@ -2,8 +2,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { DISCORD_INVITE } from "@/lib/site";
+import {
+  currentTournament,
+  findLiveMatch,
+  freeAgents,
+  isTournamentLive,
+  roundName,
+  getTeam,
+} from "@/lib/tournament";
 
-// Demo data — becomes the captain's real registration once the database exists.
+// Demo data — becomes the viewer's real registration once the database
+// exists. The role switcher previews what each kind of player sees here;
+// Steam sign-in will pick the role automatically.
 type RosterPlayer = {
   name: string;
   steam: string;
@@ -12,9 +23,12 @@ type RosterPlayer = {
   captain?: boolean;
 };
 
+type Role = "captain" | "teammate" | "free-agent";
+
 const MIN_PLAYERS = 5;
 const MAX_PLAYERS = 8;
 const POSITIONS = ["Skater", "Goalie", "Flex"] as const;
+const viewerTeamId = "ice-reapers";
 
 const initialRoster: RosterPlayer[] = [
   { name: "YourSteamName", steam: "steamcommunity.com/id/YourSteamName", discord: "reapermain", position: "Skater", captain: true },
@@ -27,7 +41,216 @@ const initialRoster: RosterPlayer[] = [
 const underlineInput =
   "w-full border-0 border-b border-steel-dark/60 bg-transparent px-0 py-1 text-sm text-steel-bright placeholder:text-muted/50 focus:border-steel focus:outline-none";
 
+function CheckInReminder() {
+  if (currentTournament.phase !== "registration") return null;
+  return (
+    <div className="steel-frame mt-8 flex flex-col gap-1 bg-card p-4 text-left">
+      <p className="text-xs font-semibold tracking-[0.2em] text-steel uppercase">
+        Check-in opens 7:15 PM EST Saturday
+      </p>
+      <p className="text-xs leading-5 text-muted">
+        Closes at 8:00 sharp — unchecked teams lose their spot to free
+        agents. Reminders go out in the{" "}
+        <a
+          href={DISCORD_INVITE}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-steel underline underline-offset-4 transition-colors hover:text-steel-bright"
+        >
+          Discord
+        </a>{" "}
+        when the window opens.
+      </p>
+    </div>
+  );
+}
+
+function LiveMatchCard() {
+  // Real derivation: renders only while the tournament is running and this
+  // team has a live match — no more hardcoded always-on card.
+  const match = isTournamentLive() ? findLiveMatch(viewerTeamId) : undefined;
+  if (!match) return null;
+  const opponentId = match.teamA === viewerTeamId ? match.teamB : match.teamA;
+  const opponent = getTeam(opponentId);
+  return (
+    <Link
+      href={`/bracket/${match.id}`}
+      className="steel-frame mt-6 flex items-center justify-between gap-4 bg-card p-5 transition-colors hover:bg-charcoal"
+    >
+      <span>
+        <span className="block text-[10px] tracking-[0.3em] text-blade-red uppercase">
+          ● Live — Your match
+        </span>
+        <span className="font-display mt-1 block text-lg font-bold tracking-[0.1em] text-steel-bright uppercase">
+          {roundName(match.round, 3)} vs {opponent?.name ?? "TBD"}
+        </span>
+      </span>
+      <span className="shrink-0 text-xs font-semibold tracking-[0.2em] text-steel uppercase">
+        Match room →
+      </span>
+    </Link>
+  );
+}
+
+function RoleSwitcher({
+  role,
+  setRole,
+}: {
+  role: Role;
+  setRole: (r: Role) => void;
+}) {
+  return (
+    <div className="mb-10 flex flex-wrap items-center gap-2">
+      <span className="text-[10px] tracking-[0.2em] text-muted uppercase">
+        Preview as (demo — Steam sign-in decides this at launch):
+      </span>
+      {(
+        [
+          { value: "captain", label: "Captain" },
+          { value: "teammate", label: "Teammate" },
+          { value: "free-agent", label: "Free Agent" },
+        ] as const
+      ).map(({ value, label }) => (
+        <button
+          key={value}
+          onClick={() => setRole(value)}
+          className={`border px-3 py-1 text-[10px] font-semibold tracking-[0.15em] uppercase transition-colors ${
+            role === value
+              ? "border-steel bg-charcoal text-steel-bright"
+              : "border-steel-dark text-muted hover:text-steel"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function FreeAgentView() {
+  const [left, setLeft] = useState(false);
+  const position = "Flex (Skater + Goalie)";
+
+  if (left) {
+    return (
+      <div>
+        <h1 className="font-display text-4xl font-bold tracking-[0.1em] text-steel-bright uppercase">
+          Out of the pool
+        </h1>
+        <p className="mt-4 max-w-md text-sm leading-6 text-muted">
+          You&apos;ve left the free-agent pool for RMR Open #
+          {currentTournament.number}. Changed your mind? Register again any
+          time before check-in closes.
+        </p>
+        <Link
+          href="/register"
+          className="mt-8 inline-block text-xs tracking-[0.2em] text-muted uppercase transition-colors hover:text-steel"
+        >
+          ← Back to registration
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-[10px] tracking-[0.35em] text-muted uppercase">
+        Free agent — RMR Open #{currentTournament.number}
+      </p>
+      <h1 className="mt-2 font-display text-4xl font-bold tracking-[0.1em] text-steel-bright uppercase sm:text-5xl">
+        In the pool
+      </h1>
+      <p className="mt-4 max-w-md text-sm leading-6 text-muted">
+        You&apos;re signed up as{" "}
+        <span className="text-steel-bright">{position}</span> with{" "}
+        {freeAgents.length - 1} other free agents. Be ready Saturday at 8:00
+        PM EST — call-ups happen at check-in.
+      </p>
+
+      <div className="steel-frame mt-8 max-w-md bg-card p-5 text-left">
+        <p className="text-xs font-semibold tracking-[0.2em] text-steel uppercase">
+          How call-ups work
+        </p>
+        <ul className="mt-3 flex list-disc flex-col gap-2 pl-4 text-sm leading-6 text-muted">
+          <li>
+            If the pool holds a full lineup (4 skaters + 1 goalie), a random
+            free-agent squad forms at check-in with a name from the preset
+            list.
+          </li>
+          <li>Everyone left fills incomplete rosters at puck drop.</li>
+          <li>A spot isn&apos;t guaranteed — but committing means being available.</li>
+        </ul>
+      </div>
+
+      <CheckInReminder />
+      <LiveMatchCard />
+
+      <div className="mt-16">
+        <button
+          onClick={() => setLeft(true)}
+          className="text-[10px] tracking-[0.2em] text-muted uppercase transition-colors hover:text-blade-red"
+        >
+          Leave the pool
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TeammateView({ roster }: { roster: RosterPlayer[] }) {
+  return (
+    <div>
+      <p className="text-[10px] tracking-[0.35em] text-muted uppercase">
+        Your team — RMR Open #{currentTournament.number} · Seed 1
+      </p>
+      <h1 className="mt-2 font-display text-4xl font-bold tracking-[0.1em] text-steel-bright uppercase sm:text-5xl">
+        Ice Reapers
+      </h1>
+      <p className="mt-3 text-xs leading-5 text-muted">
+        Your captain manages the roster and checks the team in. You just show
+        up Saturday — signed into Steam so the match chat recognizes you.
+      </p>
+
+      <CheckInReminder />
+      <LiveMatchCard />
+
+      {/* Read-only roster */}
+      <div className="mt-12 flex flex-col gap-6">
+        {roster.map((player) => (
+          <div key={player.name} className="flex items-baseline justify-between gap-4 border-b border-steel-dark/30 pb-4">
+            <div>
+              <p className="text-lg font-semibold text-steel-bright">
+                {player.name}
+                {player.captain && (
+                  <span className="ml-3 text-[10px] tracking-[0.25em] text-muted uppercase">
+                    Captain
+                  </span>
+                )}
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                {player.position} · {player.discord}
+              </p>
+            </div>
+            <a
+              href={`https://${player.steam}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 text-xs text-muted transition-colors hover:text-steel"
+            >
+              Steam ↗
+            </a>
+          </div>
+        ))}
+      </div>
+      <p className="mt-6 text-xs text-muted">
+        Something wrong with your entry? Ask your captain to fix it.
+      </p>
+    </div>
+  );
+}
+
 export default function TeamPage() {
+  const [role, setRole] = useState<Role>("captain");
   const [teamName, setTeamName] = useState("Ice Reapers");
   const [renaming, setRenaming] = useState(false);
   const [roster, setRoster] = useState(initialRoster);
@@ -55,31 +278,59 @@ export default function TeamPage() {
     setAdding(false);
   };
 
+  if (role !== "captain") {
+    return (
+      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
+        <RoleSwitcher role={role} setRole={setRole} />
+        {role === "teammate" ? (
+          <TeammateView roster={roster} />
+        ) : (
+          <FreeAgentView />
+        )}
+      </main>
+    );
+  }
+
   if (withdrawn) {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-start justify-center px-6 py-16">
         <h1 className="font-display text-4xl font-bold tracking-[0.1em] text-steel-bright uppercase">
           {teamName}
         </h1>
-        <p className="mt-4 text-sm text-muted">
-          Withdrawn from RMR Open #4. Your spot may be given to another team or
-          free agents.
+        <p className="mt-4 max-w-md text-sm leading-6 text-muted">
+          Withdrawn from RMR Open #{currentTournament.number}. Your spot is
+          released: the organizers may seat a full free-agent squad in it or
+          hand it to another team. Your roster is kept, so re-registering
+          before check-in closes takes one click.
         </p>
-        <Link
-          href="/register"
-          className="mt-8 text-xs tracking-[0.2em] text-muted uppercase transition-colors hover:text-steel"
-        >
-          ← Back to registration
-        </Link>
+        <div className="mt-8 flex items-center gap-6">
+          <Link
+            href="/register"
+            className="text-xs tracking-[0.2em] text-steel uppercase underline underline-offset-4 transition-colors hover:text-steel-bright"
+          >
+            Re-register
+          </Link>
+          <button
+            onClick={() => {
+              setWithdrawn(false);
+              setConfirmingWithdraw(false);
+            }}
+            className="text-xs tracking-[0.2em] text-muted uppercase transition-colors hover:text-steel"
+          >
+            Undo withdraw (demo)
+          </button>
+        </div>
       </main>
     );
   }
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
+      <RoleSwitcher role={role} setRole={setRole} />
+
       {/* Team name */}
       <p className="text-[10px] tracking-[0.35em] text-muted uppercase">
-        Your team — RMR Open #4 · Seed 1
+        Your team — RMR Open #{currentTournament.number} · Seed 1
       </p>
       {renaming ? (
         <input
@@ -117,26 +368,8 @@ export default function TeamPage() {
         {checkedIn ? "✓ Checked In" : "Check In"}
       </button>
 
-      {/* Current match — front and center while the tournament runs */}
-      <Link
-        href="/bracket/sf-1"
-        className="steel-frame mt-6 flex items-center justify-between gap-4 bg-card p-5 transition-colors hover:bg-charcoal"
-      >
-        <span>
-          <span className="block text-[10px] tracking-[0.3em] text-blade-red uppercase">
-            ● Live — Your match
-          </span>
-          <span className="font-display mt-1 block text-lg font-bold tracking-[0.1em] text-steel-bright uppercase">
-            Semifinal vs Top Shelf
-          </span>
-        </span>
-        <span className="shrink-0 text-xs font-semibold tracking-[0.2em] text-steel uppercase">
-          Match room →
-        </span>
-      </Link>
-      <p className="mt-2 text-[10px] tracking-[0.15em] text-muted uppercase">
-        Demo — appears only while the tournament is running
-      </p>
+      <CheckInReminder />
+      <LiveMatchCard />
 
       {/* Roster */}
       <div className="mt-12 flex flex-col gap-8">

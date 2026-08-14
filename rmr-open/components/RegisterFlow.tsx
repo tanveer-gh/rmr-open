@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { DISCORD_INVITE } from "@/lib/site";
 
 type Step = "signed-out" | "form" | "done";
 type Mode = "team" | "free-agent";
@@ -134,6 +135,18 @@ export default function RegisterFlow() {
             </ul>
           </div>
         )}
+        <a
+          href={DISCORD_INVITE}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 w-full border border-steel-dark px-4 py-3 text-xs font-semibold tracking-[0.2em] text-steel uppercase transition-colors hover:border-steel hover:text-steel-bright"
+        >
+          Join the RMR Open Discord →
+        </a>
+        <p className="text-xs leading-5 text-muted">
+          Announcements, check-in reminders, and free-agent call-ups all
+          happen there — don&apos;t miss puck drop.
+        </p>
         <button
           onClick={() => setStep("signed-out")}
           className="mt-2 text-xs tracking-[0.2em] text-muted uppercase transition-colors hover:text-steel"
@@ -240,10 +253,10 @@ export default function RegisterFlow() {
                   type="text"
                   readOnly
                   value={captain.steam}
-                  aria-description="Filled automatically from your Steam sign-in"
+                  aria-describedby="captain-steam-note"
                   className={`${inputClasses} cursor-default text-muted`}
                 />
-                <span className="text-[10px] text-muted">
+                <span id="captain-steam-note" className="text-[10px] text-muted">
                   Filled from your Steam sign-in
                 </span>
               </label>

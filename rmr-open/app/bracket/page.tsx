@@ -10,6 +10,7 @@ import {
   freeAgents,
   hasFullFreeAgentTeam,
   matches,
+  nextFreeAgentTeamName,
   teams,
   type Match,
   type TournamentPhase,
@@ -122,7 +123,11 @@ export default function TournamentHubPage() {
             {hasFullFreeAgentTeam(freeAgents) && (
               <p className="mt-4 text-xs leading-5 text-green-400">
                 Enough for a full team — a random free agent squad forms at
-                check-in.
+                check-in as{" "}
+                <span className="font-semibold">
+                  {nextFreeAgentTeamName(teams.map((t) => t.name))}
+                </span>
+                .
               </p>
             )}
             <p className="mt-2 text-xs leading-5 text-muted">
