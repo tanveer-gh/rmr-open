@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { DISCORD_INVITE } from "@/lib/site";
+import { DISCORD_INVITE, STEAM_ID64_RE, steamProfileUrl } from "@/lib/site";
 import {
   currentTournament,
   findLiveMatch,
@@ -232,7 +232,7 @@ function TeammateView({ roster }: { roster: RosterPlayer[] }) {
               </p>
             </div>
             <a
-              href={`https://${player.steam}`}
+              href={steamProfileUrl(player.steam)}
               target="_blank"
               rel="noopener noreferrer"
               className="shrink-0 text-xs text-muted transition-colors hover:text-steel"
@@ -271,9 +271,14 @@ export default function TeamPage() {
   };
 
   const addPlayer = () => {
-    if (!newPlayer.steam) return;
-    const handle = newPlayer.steam.split("/").filter(Boolean).pop() ?? "NewPlayer";
-    setRoster((prev) => [...prev, { name: handle, ...newPlayer }]);
+    const ref = newPlayer.steam.trim();
+    if (!ref) return;
+    // Accept a profile link or a bare SteamID64; the display name becomes
+    // the real Steam persona once auth is wired up.
+    const handle = STEAM_ID64_RE.test(ref)
+      ? `ID ${ref.slice(0, 5)}…${ref.slice(-4)}`
+      : (ref.split("/").filter(Boolean).pop() ?? "NewPlayer");
+    setRoster((prev) => [...prev, { ...newPlayer, steam: ref, name: handle }]);
     setNewPlayer({ steam: "", discord: "", position: "Skater" });
     setAdding(false);
   };
@@ -418,7 +423,7 @@ export default function TeamPage() {
                 ))}
               </select>
               <a
-                href={`https://${player.steam}`}
+                href={steamProfileUrl(player.steam)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="self-end pb-1 text-xs text-muted transition-colors hover:text-steel"
@@ -440,7 +445,7 @@ export default function TeamPage() {
                 onChange={(e) =>
                   setNewPlayer((p) => ({ ...p, steam: e.target.value }))
                 }
-                placeholder="Steam profile link"
+                placeholder="Steam profile link or SteamID64"
                 className={underlineInput}
               />
               <input

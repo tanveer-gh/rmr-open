@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { DISCORD_INVITE } from "@/lib/site";
+import { DISCORD_INVITE, STEAM_REF_PATTERN } from "@/lib/site";
 
 type Step = "signed-out" | "form" | "done";
 type Mode = "team" | "free-agent";
@@ -238,9 +238,9 @@ export default function RegisterFlow() {
               </span>
             </div>
             <p className="text-xs leading-5 text-muted">
-              Every player needs a Steam profile link, Discord username, and
-              position. In-game names and stats link up automatically from
-              Steam.
+              Every player needs a Steam profile link or SteamID64 (the
+              17-digit number), a Discord username, and a position. In-game
+              names and stats link up automatically from Steam.
             </p>
 
             {/* Captain — player 1 */}
@@ -304,7 +304,7 @@ export default function RegisterFlow() {
               >
                 <label className="flex flex-col gap-1">
                   <span className="text-[10px] tracking-[0.15em] text-muted uppercase">
-                    Player {index + 2} — Steam profile link
+                    Player {index + 2} — Steam profile or ID64
                   </span>
                   <input
                     type="text"
@@ -313,7 +313,9 @@ export default function RegisterFlow() {
                     onChange={(e) =>
                       updateTeammate(index, "steam", e.target.value)
                     }
-                    placeholder="steamcommunity.com/id/..."
+                    placeholder="steamcommunity.com/id/… or 76561198…"
+                    pattern={STEAM_REF_PATTERN}
+                    title="A steamcommunity.com profile link or a 17-digit SteamID64"
                     className={inputClasses}
                   />
                 </label>

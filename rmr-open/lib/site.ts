@@ -11,3 +11,20 @@ export function phlstatsPlayerUrl(playerName: string): string {
 }
 
 export const PHLSTATS_HOME = "https://phlstats.com/";
+
+// Players can identify themselves by Steam profile link OR SteamID64 —
+// the 17-digit number everything hangs off. These helpers accept both.
+
+export const STEAM_ID64_RE = /^\d{17}$/;
+
+// HTML input `pattern` matching a steamcommunity link or a SteamID64.
+export const STEAM_REF_PATTERN =
+  "(https?://)?(www\\.)?steamcommunity\\.com/.+|\\d{17}";
+
+export function steamProfileUrl(ref: string): string {
+  const trimmed = ref.trim();
+  if (STEAM_ID64_RE.test(trimmed)) {
+    return `https://steamcommunity.com/profiles/${trimmed}`;
+  }
+  return trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
+}
