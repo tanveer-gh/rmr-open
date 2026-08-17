@@ -6,8 +6,9 @@
 // in through Steam whose ID is on the list gets /admin automatically, and
 // the passcode disappears.
 
-// CHANGE BEFORE LAUNCH — and move server-side with the database.
-export const ADMIN_PASSCODE = "puckdrop";
+// Demo gate only — the repo is public, so treat this as keeping honest
+// people out. Real access control arrives with Steam auth + the database.
+export const ADMIN_PASSCODE = "rmr123";
 
 // localStorage key marking a device as organizer-approved.
 export const ADMIN_UNLOCK_KEY = "rmr-admin-unlocked";
