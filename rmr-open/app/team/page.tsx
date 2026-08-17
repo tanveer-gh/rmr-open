@@ -216,8 +216,8 @@ function TeammateView({ roster }: { roster: RosterPlayer[] }) {
 
       {/* Read-only roster */}
       <div className="mt-12 flex flex-col gap-6">
-        {roster.map((player) => (
-          <div key={player.name} className="flex items-baseline justify-between gap-4 border-b border-steel-dark/30 pb-4">
+        {roster.map((player, index) => (
+          <div key={index} className="flex items-baseline justify-between gap-4 border-b border-steel-dark/30 pb-4">
             <div>
               <p className="text-lg font-semibold text-steel-bright">
                 {player.name}
@@ -257,6 +257,7 @@ export default function TeamPage() {
   const [checkedIn, setCheckedIn] = useState(false);
   const [adding, setAdding] = useState(false);
   const [newPlayer, setNewPlayer] = useState({ steam: "", discord: "", position: "Skater" });
+  const [addError, setAddError] = useState("");
   const [confirmingWithdraw, setConfirmingWithdraw] = useState(false);
   const [withdrawn, setWithdrawn] = useState(false);
 
@@ -273,6 +274,12 @@ export default function TeamPage() {
   const addPlayer = () => {
     const ref = newPlayer.steam.trim();
     if (!ref) return;
+    if (
+      roster.some((p) => p.steam.trim().toLowerCase() === ref.toLowerCase())
+    ) {
+      setAddError("That player is already on the roster.");
+      return;
+    }
     // Accept a profile link or a bare SteamID64; the display name becomes
     // the real Steam persona once auth is wired up.
     const handle = STEAM_ID64_RE.test(ref)
@@ -280,6 +287,7 @@ export default function TeamPage() {
       : (ref.split("/").filter(Boolean).pop() ?? "NewPlayer");
     setRoster((prev) => [...prev, { ...newPlayer, steam: ref, name: handle }]);
     setNewPlayer({ steam: "", discord: "", position: "Skater" });
+    setAddError("");
     setAdding(false);
   };
 
@@ -468,6 +476,9 @@ export default function TeamPage() {
                 ))}
               </select>
             </div>
+            {addError && (
+              <p className="mt-3 text-xs text-blade-red">{addError}</p>
+            )}
             <div className="mt-4 flex items-center gap-5">
               <button
                 onClick={addPlayer}
@@ -476,7 +487,10 @@ export default function TeamPage() {
                 Add
               </button>
               <button
-                onClick={() => setAdding(false)}
+                onClick={() => {
+                  setAdding(false);
+                  setAddError("");
+                }}
                 className="text-[10px] tracking-[0.2em] text-muted uppercase transition-colors hover:text-steel"
               >
                 Cancel

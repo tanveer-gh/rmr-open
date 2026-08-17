@@ -9,7 +9,11 @@ import { ADMIN_PASSCODE, ADMIN_UNLOCK_KEY } from "@/lib/organizers";
 
 // Tiny external store around the localStorage unlock flag, so components
 // stay in sync with it (including across tabs) without effect-driven state.
+// Storage access can throw when the browser blocks site data — the memory
+// flag keeps the gate working for the session and everything else falls
+// back to "locked" instead of crashing the page.
 let listeners: Array<() => void> = [];
+let memoryUnlocked = false;
 
 function subscribe(listener: () => void) {
   listeners.push(listener);
@@ -21,7 +25,11 @@ function subscribe(listener: () => void) {
 }
 
 function getSnapshot() {
-  return localStorage.getItem(ADMIN_UNLOCK_KEY) === "yes";
+  try {
+    return memoryUnlocked || localStorage.getItem(ADMIN_UNLOCK_KEY) === "yes";
+  } catch {
+    return memoryUnlocked;
+  }
 }
 
 // Server render (and first hydration pass) always shows the locked gate.
@@ -30,10 +38,15 @@ function getServerSnapshot() {
 }
 
 function setUnlocked(value: boolean) {
-  if (value) {
-    localStorage.setItem(ADMIN_UNLOCK_KEY, "yes");
-  } else {
-    localStorage.removeItem(ADMIN_UNLOCK_KEY);
+  memoryUnlocked = value;
+  try {
+    if (value) {
+      localStorage.setItem(ADMIN_UNLOCK_KEY, "yes");
+    } else {
+      localStorage.removeItem(ADMIN_UNLOCK_KEY);
+    }
+  } catch {
+    // Storage unavailable — the in-memory flag still unlocks this visit.
   }
   listeners.forEach((l) => l());
 }

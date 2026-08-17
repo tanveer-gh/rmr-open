@@ -28,6 +28,7 @@ function linkClasses(active: boolean) {
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const liveMatch = isTournamentLive() ? findLiveMatch(viewerTeamId) : undefined;
 
   return (
     <header className="sticky top-0 z-50 border-b border-steel-dark/50 bg-abyss/95 backdrop-blur">
@@ -66,11 +67,7 @@ export default function Navbar() {
               current match, falling back to the bracket between games. */}
           {isTournamentLive() && (
             <Link
-              href={
-                findLiveMatch(viewerTeamId)
-                  ? `/bracket/${findLiveMatch(viewerTeamId)!.id}`
-                  : "/bracket"
-              }
+              href={liveMatch ? `/bracket/${liveMatch.id}` : "/bracket"}
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 text-sm font-bold tracking-[0.25em] text-blade-red uppercase transition-colors hover:text-red-400"
             >

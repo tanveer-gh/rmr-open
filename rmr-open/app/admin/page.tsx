@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AdminGate from "@/components/AdminGate";
 import { organizers as seedOrganizers, type Organizer } from "@/lib/organizers";
+import { STEAM_ID64_RE } from "@/lib/site";
 import {
   matches as seedMatches,
   teams as seedTeams,
@@ -60,6 +61,7 @@ export default function AdminPage() {
   const [disputes, setDisputes] = useState<ScoreDispute[]>(seedDisputes);
   const [organizers, setOrganizers] = useState<Organizer[]>(seedOrganizers);
   const [newOrganizer, setNewOrganizer] = useState({ steamId: "", name: "" });
+  const [organizerError, setOrganizerError] = useState("");
   const [poolSeated, setPoolSeated] = useState(false);
 
   const reseed = (list: Team[]) => list.map((t, i) => ({ ...t, seed: i + 1 }));
@@ -74,23 +76,34 @@ export default function AdminPage() {
     });
   };
 
+  // State updaters must stay pure — compute the moving team first, then
+  // issue the two updates as siblings (StrictMode double-invokes updaters).
   const withdrawTeam = (id: string) => {
-    setTeams((prev) => {
-      const team = prev.find((t) => t.id === id);
-      if (team) setWithdrawn((w) => [...w, team]);
-      return reseed(prev.filter((t) => t.id !== id));
-    });
+    const team = teams.find((t) => t.id === id);
+    if (!team) return;
+    setTeams((prev) => reseed(prev.filter((t) => t.id !== id)));
+    setWithdrawn((prev) => [...prev, team]);
   };
 
   const restoreTeam = (id: string) => {
-    setWithdrawn((prev) => {
-      const team = prev.find((t) => t.id === id);
-      if (team) setTeams((ts) => reseed([...ts, team]));
-      return prev.filter((t) => t.id !== id);
-    });
+    const team = withdrawn.find((t) => t.id === id);
+    if (!team) return;
+    setWithdrawn((prev) => prev.filter((t) => t.id !== id));
+    setTeams((prev) => reseed([...prev, team]));
   };
 
   const seatFreeAgentSquad = () => {
+    // A squad is exactly 4 skaters + 1 goalie (a true goalie beats a Flex);
+    // everyone else stays in the pool to fill short rosters.
+    const goalie =
+      freeAgents.find((a) => a.position === "Goalie") ??
+      freeAgents.find((a) => a.position === "Flex");
+    if (!goalie) return;
+    const skaters = freeAgents
+      .filter((a) => a !== goalie && a.position !== "Goalie")
+      .slice(0, 4);
+    if (skaters.length < 4) return;
+    const lineup = [...skaters, goalie];
     setTeams((prev) => {
       const name = nextFreeAgentTeamName(prev.map((t) => t.name));
       const squad: Team = {
@@ -98,7 +111,7 @@ export default function AdminPage() {
         name,
         seed: prev.length + 1,
         checkedIn: true,
-        players: freeAgents.map((agent, i) => ({
+        players: lineup.map((agent, i) => ({
           name: agent.name,
           position:
             agent.position === "Goalie"
@@ -142,13 +155,20 @@ export default function AdminPage() {
 
   const addOrganizer = () => {
     const steamId = newOrganizer.steamId.trim();
-    if (!/^\d{17}$/.test(steamId)) return;
-    if (organizers.some((o) => o.steamId === steamId)) return;
+    if (!STEAM_ID64_RE.test(steamId)) {
+      setOrganizerError("That doesn't look like a SteamID64 — it's 17 digits.");
+      return;
+    }
+    if (organizers.some((o) => o.steamId === steamId)) {
+      setOrganizerError("That Steam ID is already on the list.");
+      return;
+    }
     setOrganizers((prev) => [
       ...prev,
       { steamId, name: newOrganizer.name.trim() || "Organizer" },
     ]);
     setNewOrganizer({ steamId: "", name: "" });
+    setOrganizerError("");
   };
 
   return (
@@ -318,7 +338,7 @@ export default function AdminPage() {
             </button>
             <span className="text-xs text-muted">
               {poolSeated
-                ? "Squad seated — leftover agents fill short rosters."
+                ? `Squad seated (4 skaters + 1 goalie) — ${freeAgents.length - 5} left in the pool to fill short rosters.`
                 : hasFullFreeAgentTeam(freeAgents)
                   ? "Pool holds a full lineup — name comes from the preset list."
                   : "Needs 4 skaters + 1 goalie in the pool."}
@@ -531,6 +551,9 @@ export default function AdminPage() {
               Add organizer
             </button>
           </form>
+          {organizerError && (
+            <p className="mt-2 text-xs text-blade-red">{organizerError}</p>
+          )}
           <p className="mt-2 text-xs text-muted">
             Find a SteamID64 at steamcommunity.com → profile → Edit Profile,
             or via steamid.io.
