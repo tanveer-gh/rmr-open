@@ -17,5 +17,6 @@
     "design-system/fonts/fonts.css"
   ],
   "readmeHeader": ".design-sync/conventions.md",
-  "entry": "rmr-open/design-sync.entry.mjs"
+  "entry": "rmr-open/design-sync.entry.mjs",
+  "projectId": "9a07bee7-ef0f-4855-9df3-c5e2ed130c1f"
 }
