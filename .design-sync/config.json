@@ -1,0 +1,21 @@
+{
+  "pkg": "rmr-open",
+  "globalName": "RMROpen",
+  "shape": "package",
+  "buildCmd": "npm run build",
+  "srcDir": "components",
+  "componentSrcMap": {
+    "Navbar": null,
+    "Countdown": null,
+    "RegisterFlow": null,
+    "TeamShowcase": null,
+    "Bracket": null,
+    "AdminGate": null
+  },
+  "cssEntry": "design-system/rmr.css",
+  "extraFonts": [
+    "design-system/fonts/fonts.css"
+  ],
+  "readmeHeader": ".design-sync/conventions.md",
+  "entry": "rmr-open/design-sync.entry.mjs"
+}

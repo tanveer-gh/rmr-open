@@ -1,0 +1,289 @@
+/* RMR Open design tokens — copied verbatim from rmr-open/app/globals.css.
+   Charcoal + steel palette matched to the reaper/scythe artwork. */
+:root {
+  --abyss: #0b0d10;
+  --charcoal: #171b20;
+  --charcoal-light: #21262d;
+  --steel: #aeb9bf;
+  --steel-bright: #e6ecef;
+  --steel-dark: #454c54;
+  --muted: #7d868d;
+  --card: #101318;
+  --blade-red: #c1272d;
+  --blade-blue: #1f5fa0;
+}
+
+/* RMR Open design language — portable CSS derived 1:1 from the site.
+   Every value is copied from the app's own styling:
+   - app/globals.css            (body, .steel-frame, .hero-atmosphere)
+   - app/history/page.tsx       (leaderboard table recipe)
+   - components/TeamShowcase.tsx (divider list recipe)
+   - shared page patterns       (titles, eyebrows, buttons, inputs)
+   The dark ground is the brand: there is no light theme. */
+
+/* ---------- Ground ---------- */
+
+body {
+  background: var(--abyss);
+  color: var(--steel-bright);
+  font-family: Geist, Arial, Helvetica, sans-serif;
+}
+
+/* Atmospheric backdrop for hero sections */
+.hero-atmosphere {
+  background:
+    radial-gradient(ellipse 45% 45% at 12% 30%, rgba(193, 39, 45, 0.1), transparent 70%),
+    radial-gradient(ellipse 45% 45% at 88% 30%, rgba(31, 95, 160, 0.12), transparent 70%),
+    radial-gradient(ellipse 70% 45% at 50% 115%, rgba(200, 208, 212, 0.05), transparent 70%),
+    linear-gradient(to bottom, #12151a, var(--abyss) 60%, #08090c);
+}
+
+/* ---------- The steel frame (signature container) ---------- */
+
+/* Thin steel frame with brighter corner ticks */
+.steel-frame {
+  position: relative;
+  border: 1px solid var(--steel-dark);
+}
+.steel-frame::before,
+.steel-frame::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--steel);
+  border-style: solid;
+}
+.steel-frame::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.steel-frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* A framed panel: steel frame on the card ground */
+.rmr-card {
+  position: relative;
+  border: 1px solid var(--steel-dark);
+  background: var(--card);
+  padding: 1.5rem;
+}
+.rmr-card::before,
+.rmr-card::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--steel);
+  border-style: solid;
+}
+.rmr-card::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.rmr-card::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+/* ---------- Typography ---------- */
+
+/* Display titles: Cinzel, wide-tracked, uppercase */
+.rmr-title {
+  font-family: Cinzel, Georgia, serif;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--steel-bright);
+}
+.rmr-title--hero { font-size: 3rem; line-height: 1; letter-spacing: 0.1em; }
+.rmr-title--section {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+}
+
+/* Title between fading hairlines (the page-header treatment) */
+.rmr-rule-title {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.rmr-rule-title::before,
+.rmr-rule-title::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+}
+.rmr-rule-title::before {
+  background: linear-gradient(to right, transparent, var(--steel-dark));
+}
+.rmr-rule-title::after {
+  background: linear-gradient(to left, transparent, var(--steel-dark));
+}
+
+/* Eyebrow line under/over titles */
+.rmr-eyebrow {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Small field/section labels */
+.rmr-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Live indicator text */
+.rmr-live {
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--blade-red);
+}
+
+/* ---------- Tables (the leaderboard recipe) ---------- */
+
+.rmr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.rmr-table th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(69, 76, 84, 0.5);
+}
+.rmr-table td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid rgba(69, 76, 84, 0.3);
+  color: var(--steel);
+}
+.rmr-table tbody tr:hover { background: rgba(23, 27, 32, 0.5); }
+.rmr-table tbody tr:last-child td { border-bottom: 0; }
+
+/* Numeric columns right-align with lining digits */
+.rmr-table th.is-num,
+.rmr-table td.is-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+/* The column that matters (points, totals, names) */
+.rmr-table td.is-key {
+  color: var(--steel-bright);
+  font-weight: 600;
+}
+/* Alternating shading variant (the team-list treatment) */
+.rmr-table--striped tbody tr:nth-child(even) { background: rgba(23, 27, 32, 0.3); }
+
+/* ---------- Divider lists (the team-showcase recipe) ---------- */
+
+.rmr-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rmr-list > li {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(69, 76, 84, 0.4);
+}
+.rmr-list > li:first-child { border-top: 1px solid rgba(69, 76, 84, 0.4); }
+.rmr-list > li:nth-child(even) { background: rgba(23, 27, 32, 0.3); }
+
+/* ---------- Controls ---------- */
+
+/* Primary action: framed, tracked, uppercase */
+.rmr-button {
+  position: relative;
+  border: 1px solid var(--steel-dark);
+  background: rgba(23, 27, 32, 0.6);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--steel);
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+}
+.rmr-button::before,
+.rmr-button::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--steel);
+  border-style: solid;
+}
+.rmr-button::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+.rmr-button::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+.rmr-button:hover {
+  background: var(--charcoal);
+  color: var(--steel-bright);
+}
+
+/* High-stakes action (the check-in button treatment) */
+.rmr-button--danger {
+  border: 2px solid var(--blade-red);
+  background: rgba(193, 39, 45, 0.1);
+  padding: 1rem 2.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--blade-red);
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+.rmr-button--danger:hover { background: rgba(193, 39, 45, 0.2); }
+
+/* Quiet text action */
+.rmr-button--ghost {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 150ms;
+}
+.rmr-button--ghost:hover { color: var(--steel); }
+
+/* Text inputs and selects */
+.rmr-input {
+  width: 100%;
+  border: 1px solid var(--steel-dark);
+  background: var(--abyss);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--steel-bright);
+}
+.rmr-input::placeholder { color: rgba(125, 134, 141, 0.6); }
+.rmr-input:focus {
+  border-color: var(--steel);
+  outline: none;
+}
+
+/* Underline-only variant (the roster-editing treatment) */
+.rmr-input--underline {
+  border: 0;
+  border-bottom: 1px solid rgba(69, 76, 84, 0.6);
+  background: transparent;
+  padding: 0.25rem 0;
+}
+.rmr-input--underline:focus { border-bottom-color: var(--steel); }
